@@ -6,6 +6,7 @@ import torchvision
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
+LOG_DIR = ROOT_DIR / "logs"
 
 @dataclass
 class DataPath:
@@ -47,14 +48,13 @@ class CatDog_Data:
 class Log:
     def __init__(self, name="") -> None:
         self.logger = logging.getLogger(name)
-        self.log_dir = ROOT_DIR / "logs"
     
     def get_logger(self, log_level=logging.INFO, log_file=None):
         self.log_level = log_level
         self.logger.setLevel(log_level)
         self.init_formatter()
         if log_file is not None:
-            self._add_file_hander(self.log_dir / log_file)
+            self._add_file_hander(LOG_DIR / log_file)
         else:
             self._add_stream_hander()
         return self.logger
