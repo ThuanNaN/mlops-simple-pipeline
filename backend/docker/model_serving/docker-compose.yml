@@ -9,10 +9,18 @@ services:
     env_file:
       - ../../.env
     volumes:
-      - /data_source:/data_source
-      - /logs:/logs
+      - type: bind
+        source: ../../data_source
+        target: /backend/data_source
+      - type: bind
+        source: ../../logs
+        target: /backend/logs
     ports:
       - "5000:5000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     entrypoint: ["python", "src/model_serving.py"]
+  
+volumes:
+  data_source:
+  logs:
