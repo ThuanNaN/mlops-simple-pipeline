@@ -5,7 +5,6 @@ load_dotenv()
 from utils import CatDog_Data, Log, DataPath
 from config import ServeConfig
 from PIL import Image
-import numpy as np
 import torch
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -13,7 +12,7 @@ from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-logger = Log(__file__).log
+logger = Log(__file__).get_logger(log_file="model_serving.log")
 logger.info("Starting Model Serving")
 
 

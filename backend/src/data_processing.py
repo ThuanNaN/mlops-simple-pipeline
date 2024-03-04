@@ -6,7 +6,7 @@ from typing import List
 import glob
 from utils import DataPath, CatDog_Data, Log
 
-logger = Log(__file__).log
+logger = Log(__file__).get_logger()
 logger.info("Starting Data Preprocessing")
 
 def create_training_data(version: str, source_dir: List[str], dest_dir: str, ratio: List[float]):

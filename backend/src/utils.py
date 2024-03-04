@@ -1,11 +1,14 @@
 import logging
+from logging.handlers import RotatingFileHandler
 import sys
 from dataclasses import dataclass
 import torchvision
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).parent.parent
+
+@dataclass
 class DataPath:
-    ROOT_DIR = Path(__file__).parent.parent
     SOUCE_DIR = ROOT_DIR / "src"
     DATA_DIR = ROOT_DIR / "data_source"
 
@@ -42,22 +45,34 @@ class CatDog_Data:
     ])
 
 class Log:
-    log: logging.Logger = None
-
-    def __init__(self, name="", log_level=logging.INFO) -> None:
-        if Log.log == None:
-            Log.log = self._init_logger(name, log_level)
-
-    def _init_logger(self, name, log_level):
-        logger = logging.getLogger(name)
-        formatter = logging.Formatter(
+    def __init__(self, name="") -> None:
+        self.logger = logging.getLogger(name)
+        self.log_dir = ROOT_DIR / "logs"
+    
+    def get_logger(self, log_level=logging.INFO, log_file=None):
+        self.log_level = log_level
+        self.logger.setLevel(log_level)
+        self.init_formatter()
+        if log_file is not None:
+            self._add_file_hander(self.log_dir / log_file)
+        else:
+            self._add_stream_hander()
+        return self.logger
+    
+    def init_formatter(self):
+        self.formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
+    def _add_stream_hander(self):
         stream_handler = logging.StreamHandler(sys.stdout)
-        stream_handler.setFormatter(formatter)
-        logger.addHandler(stream_handler)
-        logger.setLevel(log_level)
-        return logger
+        stream_handler.setFormatter(self.formatter)
+        self.logger.addHandler(stream_handler)
+
+    def _add_file_hander(self, log_file):
+        file_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=10)
+        file_handler.setFormatter(self.formatter)
+        self.logger.addHandler(file_handler)
+
 
 def seed_everything(seed=42):
     import random

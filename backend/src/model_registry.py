@@ -6,7 +6,7 @@ load_dotenv()
 import mlflow
 from mlflow.tracking import MlflowClient
 
-logger = Log(__file__).log
+logger = Log(__file__).get_logger()
 logger.info("Starting Model Registry")
 
 if __name__ == "__main__":

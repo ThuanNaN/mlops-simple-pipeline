@@ -3,7 +3,7 @@ import torchvision
 from modeling import create_resnet, Trainer
 from utils import DataPath, CatDog_Data, Log, seed_everything
 
-logger = Log(__file__).log
+logger = Log(__file__).get_logger()
 logger.info("Starting Model Training")
 
 if __name__ == "__main__":
