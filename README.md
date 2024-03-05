@@ -8,5 +8,5 @@
 - FastAPI - https://fastapi.tiangolo.com
 - Unicorn - https://www.uvicorn.org
 
-## 3. Fronend Interface
+## 3. Frontend Interface
 - Gradio - https://www.gradio.app
