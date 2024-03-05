@@ -23,7 +23,7 @@ class ResponsePrediction(BaseModel):
     predicted_id: int = -1
     predicted_class: str = "unknown"
     predictor_name: str = "unknown"
-    predictor__alias: str = "unknown"
+    predictor_alias: str = "unknown"
 
 class ModelServing:
     def __init__(self, serve_config: ServeConfig):
