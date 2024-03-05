@@ -14,11 +14,15 @@ serving_down:
 serving_restart:
 	docker compose -f ./docker/model_serving/docker-compose.yml restart
 
-teardown:
+all_up:
+	make mlflow_up
+	make serving_up
+
+all_down:
 	make mlflow_down
 	make serving_down
 
 rebuild_serving:
 	make serving_down
 	docker rmi model_serving-model_serving
-	make serving_up 
+	make serving_up
