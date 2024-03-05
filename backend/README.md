@@ -34,7 +34,7 @@ python src/model_training.py --data_version v1.1 --model_name resnet_18 --device
 python src/model_registry.py --filter_string "tags.Dataset_version LIKE 'v1.1'" --config_tag add_collect --alias Challenger 
 ```
 
-### 2.4 Restart to choice the best model for serving
+### 2.4 Restart to change config of new model for serving
 ```bash
 make serving_down
 make model_config=add_collect serving_up
