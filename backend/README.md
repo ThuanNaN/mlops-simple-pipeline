@@ -1,3 +1,7 @@
+## Install packages
+```bash
+pip3 install -r requirements.txt
+```
 
 ## 1. Start MLflow server
 ```bash
