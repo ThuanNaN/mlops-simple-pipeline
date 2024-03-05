@@ -2,5 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ServeConfig:
-    model_name: str = "resnet18"
+    config_tag: str = "raw_data"
+    model_name: str = "resnet_18"
     model_alias: str = "Production"
+
