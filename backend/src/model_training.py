@@ -3,10 +3,10 @@ import torchvision
 from modeling import Trainer, create_mobilenet, create_resnet
 from utils import DataPath, CatDog_Data, Log, seed_everything
 
-logger = Log(__file__).get_logger()
-logger.info("Starting Model Training")
 
 if __name__ == "__main__":
+    logger = Log(__file__).get_logger()
+    logger.info("Starting Model Training")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_version", type=str, required=True)

@@ -13,6 +13,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 @dataclass
 class DataPath:
     SOUCE_DIR = ROOT_DIR / "src"
+    CONFIG_DIR = SOUCE_DIR / "config"
     DATA_DIR = ROOT_DIR / "data_source"
 
     RAW_DATA_DIR = DATA_DIR / "catdog_raw"

@@ -9,6 +9,7 @@ from PIL import Image
 from config import ServeConfig
 from utils import CatDog_Data, Log, DataPath
 import os
+import json
 import uvicorn
 from dotenv import load_dotenv
 load_dotenv()
@@ -17,14 +18,15 @@ logger = Log(__file__).get_logger(log_file="model_serving.log")
 logger.info("Starting Model Serving")
 
 class ResponsePrediction(BaseModel):
-    predicted_prob: float = -1.0
+    probs: list = []
+    best_prob: float = -1.0
     predicted_id: int = -1
     predicted_class: str = "unknown"
     predictor_name: str = "unknown"
     predictor__alias: str = "unknown"
 
 class ModelServing:
-    def __init__(self):
+    def __init__(self, serve_config: ServeConfig):
         self.app = FastAPI()
         self.app.add_middleware(
             CORSMiddleware,
@@ -34,6 +36,7 @@ class ModelServing:
             allow_headers=["*"],
         )
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.serve_config = serve_config
         self.load_model()
 
         @self.app.get("/")
@@ -57,25 +60,27 @@ class ModelServing:
 
             output = self.loaded_model(transformed_image.to(self.device)).detach().cpu()
 
-            predicted_prob, predicted_id, predicted_class = self.output2pred(output)
+            probs, best_prob, predicted_id, predicted_class = self.output2pred(output)
 
-            ModelServing.log_model(ServeConfig.model_name, ServeConfig.model_alias)
-            ModelServing.log_response(predicted_prob, predicted_id, predicted_class)
+            ModelServing.log_model(self.serve_config.model_name, self.serve_config.model_alias)
+            ModelServing.log_response(best_prob, predicted_id, predicted_class)
 
             torch.cuda.empty_cache()
             ModelServing.save_cache(file_upload.filename, 
                                     DataPath.CAPTURED_DATA_DIR, 
-                                    ServeConfig.model_name, 
-                                    ServeConfig.model_alias, 
-                                    predicted_prob, 
+                                    self.serve_config.model_name, 
+                                    self.serve_config.model_alias, 
+                                    probs,
+                                    best_prob, 
                                     predicted_id, 
                                     predicted_class)
             
-            return ResponsePrediction(predicted_prob = predicted_prob,
+            return ResponsePrediction(probs=probs,
+                                      best_prob = best_prob,
                                       predicted_id=predicted_id, 
                                       predicted_class=predicted_class, 
-                                      predictor_name=ServeConfig.model_name, 
-                                      predictor__alias=ServeConfig.model_alias)
+                                      predictor_name=self.serve_config.model_name, 
+                                      predictor__alias=self.serve_config.model_alias)
 
 
         @self.app.middleware("http")
@@ -91,20 +96,20 @@ class ModelServing:
             mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
             client = MlflowClient()
             model_info = client.get_model_version_by_alias(
-                name=ServeConfig.model_name, alias=ServeConfig.model_alias)
+                name=self.serve_config.model_name, alias=self.serve_config.model_alias)
             self.loaded_model = mlflow.pytorch.load_model(
                 model_info.source, map_location=self.device)
-            logger.info(f"Model {ServeConfig.model_name} loaded")
+            logger.info(f"Model {self.serve_config.model_name} loaded")
         except Exception as e:
             logger.info(f"Load model failed")
             logger.info(f"Error: {e}")
 
     def output2pred(self, output):
         probabilities = F.softmax(output, dim=1)
-        predicted_prob = torch.max(probabilities, 1)[0].item()
+        best_prob = torch.max(probabilities, 1)[0].item()
         predicted_id = torch.max(probabilities, 1)[1].item()
         predicted_class = CatDog_Data.id2class[predicted_id]
-        return round(predicted_prob, 6), predicted_id, predicted_class
+        return probabilities.squeeze().tolist(), round(best_prob, 6), predicted_id, predicted_class
 
     def run(self, host, port):
         uvicorn.run(self.app, host=host, port=port)
@@ -124,17 +129,24 @@ class ModelServing:
         logger.info(f"Predicted Prob: {pred_prob} -  Predicted ID: {pred_id} -  Predicted Class: {pred_class}")
 
     @staticmethod
-    def save_cache(image_name, image_path, predictor_name, predictor__alias, pred_prob, pred_id, pred_class):
+    def save_cache(image_name, image_path, predictor_name, predictor__alias, probs, best_prob, pred_id, pred_class):
         cache_path = f"{DataPath.CACHE_DIR}/predicted_cache.csv"
         cache_exists = os.path.isfile(cache_path)
         with open(cache_path, "a") as f:
             if not cache_exists:
-                f.write("Image_name, Image_path, Predictor_name, Predictor_alias, Predicted_prob, Predicted_id, Predicted_class\n")
-            f.write(f"{image_name},{image_path},{predictor_name},{predictor__alias},{pred_prob},{pred_id},{pred_class}\n")
+                f.write("Image_name, Image_path, Predictor_name, Predictor_alias, Probabilities , Best_prob, Predicted_id, Predicted_class\n")
+            f.write(f"{image_name},{image_path},{predictor_name},{predictor__alias}, {probs},{best_prob},{pred_id},{pred_class}\n")
+
 
 if __name__ == "__main__":
     host = os.getenv("API_HOST")
     port = int(os.getenv("API_PORT"))
+    
+    config_tag = os.getenv("MODEL_CONFIG")
+    with open(DataPath.CONFIG_DIR / f"{config_tag}.json", "r") as f:
+        config = json.load(f)
+    serve_config = ServeConfig(**config)
+    logger.info(f"Serve config: {serve_config}")
 
-    model_serving = ModelServing()
+    model_serving = ModelServing(serve_config)
     model_serving.run(host=host, port=port)
