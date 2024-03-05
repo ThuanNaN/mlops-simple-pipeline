@@ -2,6 +2,7 @@ import os
 import requests
 import gradio as gr
 import io
+import argparse
 from PIL import Image
 from dotenv import load_dotenv
 load_dotenv()
@@ -29,21 +30,27 @@ def predict_api(image_path):
     else:
         return "Error: API request failed."
 
-interface = gr.Interface(fn=predict_api,
-                     inputs=gr.Image(
-                         type='filepath', label="Upload Image",
-                         height=450, width=900),
-                     outputs=[
-                         gr.Label(num_top_classes=2, label="Probs "),
-                         gr.JSON(label="Info Output")
-                     ],
-                     title="Image Prediction API",
-                     examples=[
-                         os.path.join(os.path.dirname(__file__), "images/examples/sphynx_0.jpg"),
-                         os.path.join(os.path.dirname(__file__), "images/examples/American_Eskimo_Dog_1.jpg"),
-                     ],
-                     description="Upload an image to get predictions from the API.")
+if __name__ == "__main__":
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("--share", action="store_true")
+    args = argparser.parse_args()
 
-host = os.getenv("HOST")
-port = int(os.getenv("PORT"))
-interface.launch(server_name=host, server_port=port)
+    interface = gr.Interface(fn=predict_api,
+                        inputs=gr.Image(
+                            type='filepath', label="Upload Image",
+                            height=450, width=900),
+                        outputs=[
+                            gr.Label(num_top_classes=2, label="Probs "),
+                            gr.JSON(label="Info Output")
+                        ],
+                        title="Image Prediction API",
+                        examples=[
+                            os.path.join(os.path.dirname(__file__), "images/examples/sphynx_0.jpg"),
+                            os.path.join(os.path.dirname(__file__), "images/examples/American_Eskimo_Dog_1.jpg"),
+                        ],
+                        description="Upload an image to get predictions from the API.")
+
+    host = os.getenv("HOST")
+    port = int(os.getenv("PORT"))
+    interface.launch(server_name=host, server_port=port, share=args.share)
+
