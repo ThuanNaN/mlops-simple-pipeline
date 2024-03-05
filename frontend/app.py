@@ -40,7 +40,7 @@ if __name__ == "__main__":
                             type='filepath', label="Upload Image",
                             height=450, width=900),
                         outputs=[
-                            gr.Label(num_top_classes=2, label="Probs "),
+                            gr.Label(num_top_classes=2, label="Probabilites"),
                             gr.JSON(label="Info Output")
                         ],
                         title="Image Prediction API",
