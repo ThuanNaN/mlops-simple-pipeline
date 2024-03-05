@@ -10,14 +10,14 @@ make mlflow_up
 ```bash
 python src/data_processing.py --version v1.0
 
-python src/model_training.py --data_version v1.0 --model_name resnet18
+python src/model_training.py --data_version v1.0 --model_name resnet_18 --device cuda
 
-python src/model_registry.py --metric val_loss --alias Production
+python src/model_registry.py --metric val_loss --config_tag raw_data --alias Production
 ```
 
 ### 2.2 Serving trained model
 ```bash
-make serving_up
+make model_config=raw_data serving_up
 ```
 
 ### 2.3 Add more add and re-train model
@@ -25,14 +25,15 @@ make serving_up
 ```bash
 python src/data_processing.py --merge_collected --version v1.1
 
-python src/model_training.py --data_version v1.1 --model_name resnet18
+python src/model_training.py --data_version v1.1 --model_name resnet_18 --device cuda
 
-python src/model_registry.py --metric val_loss --alias Production
+python src/model_registry.py --filter_string "tags.Dataset_version LIKE 'v1.1'" --config_tag add_collect --alias Challenger 
 ```
 
 ### 2.4 Restart to choice the best model for serving
 ```bash
-make serving_restart
+make serving_down
+make model_config=add_collect serving_up
 ```
 
 ## 3. Turn on/off the system

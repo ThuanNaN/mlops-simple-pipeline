@@ -6,13 +6,10 @@ mlflow_down:
 	docker compose -f ./docker/mlflow/docker-compose.yml down
 
 serving_up:
-	docker compose -f ./docker/model_serving/docker-compose.yml up -d
+	MODEL_CONFIG=$(model_config) docker compose -f ./docker/model_serving/docker-compose.yml up -d
 
 serving_down:
-	docker compose -f ./docker/model_serving/docker-compose.yml down
-
-serving_restart:
-	docker compose -f ./docker/model_serving/docker-compose.yml restart
+	MODEL_CONFIG="" docker compose -f ./docker/model_serving/docker-compose.yml down
 
 all_up:
 	make mlflow_up
@@ -25,4 +22,4 @@ all_down:
 rebuild_serving:
 	make serving_down
 	docker rmi model_serving-model_serving
-	make serving_up
+	make model_config=add_collect serving_up
