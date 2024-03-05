@@ -11,7 +11,7 @@ logger.info("Starting Model Registry")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--metric", type=str, required=True, choices=["Val_loss", "Val_acc"], default="Val_loss")
+    parser.add_argument("--metric", type=str, required=True, choices=["val_loss", "val_acc"], default="val_loss")
     parser.add_argument("--alias", type=str, default="Production")
     args = parser.parse_args()
 
