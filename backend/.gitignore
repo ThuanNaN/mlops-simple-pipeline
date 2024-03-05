@@ -4,4 +4,5 @@ __pycache__/
 /data_source/train_data/
 /data_source/cache/
 /data_source/captured/
+/src/config/*.json
 /logs/*
