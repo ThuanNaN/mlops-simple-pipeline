@@ -62,6 +62,7 @@ class Trainer:
         run_name = f"{self.mlflow_log_pamrams['model_name']}_{self.mlflow_log_pamrams['data_version']}"
 
         with mlflow.start_run(run_name=run_name) as run:
+            mlflow.set_tags({"Dataset_version": self.mlflow_log_pamrams["data_version"]})
 
             mlflow.log_params({
                 "optimizer": optimizer.__class__.__name__,
