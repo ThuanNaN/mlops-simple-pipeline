@@ -16,6 +16,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--weight_decay", type=float, default=1e-5)
     parser.add_argument("--lr", type=float, default=1e-4)
+    parser.add_argument("--best_model_metric", type=str, default="val_loss", 
+                        choices=["val_loss", "val_acc"])
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--seed", type=int, default=43)
     args = parser.parse_args()
@@ -56,6 +58,7 @@ if __name__ == "__main__":
         "batch_size": args.batch_size,
         "weight_decay": args.weight_decay,
         "lr": args.lr,
+        "best_model_metric": args.best_model_metric,
         "device": args.device,
         "seed": args.seed
     }
@@ -68,6 +71,7 @@ if __name__ == "__main__":
                       train_data=train_data,
                       val_data=val_data,
                       batch_size=args.batch_size,   
+                      best_model_metric=args.best_model_metric,
                       device=args.device,
                       mlflow_log_pamrams=mlflow_log_pamrams,
                       verbose=True)

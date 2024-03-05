@@ -120,9 +120,11 @@ class Trainer:
 
             if self.best_model_metric == "val_loss":
                 best_model_state_dict = best_val_loss_state_dict
-            else:
+            elif self.best_model_metric == "val_acc":
                 best_model_state_dict = best_val_acc_state_dict
-                
+            else:
+                raise ValueError(f"Invalid best_model_metric: {self.best_model_metric}")
+            
             self.model.load_state_dict(best_model_state_dict)
             mlflow.pytorch.log_model(self.model, "model")
 
