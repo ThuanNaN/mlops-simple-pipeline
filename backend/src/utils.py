@@ -6,7 +6,9 @@ import torchvision
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
+
 LOG_DIR = ROOT_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 @dataclass
 class DataPath:
@@ -17,10 +19,13 @@ class DataPath:
     COLLECTED_DATA_DIR = DATA_DIR / "collected"
     CAPTURED_DATA_DIR = DATA_DIR / "captured"
     TRAIN_DATA_DIR = DATA_DIR / "train_data"
+    CACHE_DIR = DATA_DIR / "cache"
+
 
 DataPath.CAPTURED_DATA_DIR.mkdir(parents=True, exist_ok=True)
 DataPath.COLLECTED_DATA_DIR.mkdir(parents=True, exist_ok=True)
 DataPath.TRAIN_DATA_DIR.mkdir(parents=True, exist_ok=True)
+DataPath.CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @dataclass
@@ -69,7 +74,7 @@ class Log:
         self.logger.addHandler(stream_handler)
 
     def _add_file_hander(self, log_file):
-        file_handler = RotatingFileHandler(log_file, maxBytes=2000, backupCount=10)
+        file_handler = RotatingFileHandler(log_file, maxBytes=10000, backupCount=10)
         file_handler.setFormatter(self.formatter)
         self.logger.addHandler(file_handler)
 
