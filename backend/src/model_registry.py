@@ -15,7 +15,7 @@ logger.info("Starting Model Registry")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_tag", type=str, default="raw_data")
+    parser.add_argument("--config_name", type=str, default="raw_data")
     parser.add_argument("--filter_string", type=str, default="")
     parser.add_argument("--metric", type=str, choices=["val_loss", "val_acc"], default="val_loss")
     parser.add_argument("--alias", type=str, default="Production")
@@ -47,22 +47,21 @@ if __name__ == "__main__":
         client.create_registered_model(model_name)
     except:
         pass
-    
     run_id = best_runs.info.run_id
     model_uri = f'runs:/{run_id}/model'
     mv = client.create_model_version(model_name, model_uri, run_id)
     logger.info(f"Registered model: {model_name}, version: {mv.version}")
     client.set_registered_model_alias(model_name, args.alias, mv.version)
 
-    server_config = ServeConfig(config_tag=args.config_tag,
+    server_config = ServeConfig(config_name=args.config_name,
                                 model_name=model_name, 
                                 model_alias=args.alias)
 
-    path_save_cfg = DataPath.CONFIG_DIR / f"{args.config_tag}.json"
+    path_save_cfg = DataPath.CONFIG_DIR / f"{args.config_name}.json"
     with open(path_save_cfg, 'w+') as f:
         json.dump(asdict(server_config), f, indent=4)
         
-    logger.info(f"Config saved to {args.config_tag}.json")
+    logger.info(f"Config saved to {args.config_name}.json")
 
     logger.info(f"Model {model_name} registered with alias {args.alias} and version {mv.version}")
     logger.info("Model Registry completed")

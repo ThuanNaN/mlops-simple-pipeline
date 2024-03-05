@@ -16,7 +16,7 @@ python src/data_processing.py --version v1.0
 
 python src/model_training.py --data_version v1.0 --model_name resnet_18 --device cuda
 
-python src/model_registry.py --metric val_loss --config_tag raw_data --alias Production
+python src/model_registry.py --metric val_loss --alias Production --config_name raw_data
 ```
 
 ### 2.2 Serving trained model
@@ -31,7 +31,7 @@ python src/data_processing.py --merge_collected --version v1.1
 
 python src/model_training.py --data_version v1.1 --model_name resnet_18 --device cuda
 
-python src/model_registry.py --filter_string "tags.Dataset_version LIKE 'v1.1'" --config_tag add_collect --alias Challenger 
+python src/model_registry.py --filter_string "tags.Dataset_version LIKE 'v1.1'" --alias Challenger  --config_name add_collect
 ```
 
 ### 2.4 Restart to change config of new model for serving

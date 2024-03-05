@@ -142,8 +142,8 @@ if __name__ == "__main__":
     host = os.getenv("API_HOST")
     port = int(os.getenv("API_PORT"))
     
-    config_tag = os.getenv("MODEL_CONFIG")
-    with open(DataPath.CONFIG_DIR / f"{config_tag}.json", "r") as f:
+    config_name = os.getenv("MODEL_CONFIG")
+    with open(DataPath.CONFIG_DIR / f"{config_name}.json", "r") as f:
         config = json.load(f)
     serve_config = ServeConfig(**config)
     logger.info(f"Serve config: {serve_config}")
