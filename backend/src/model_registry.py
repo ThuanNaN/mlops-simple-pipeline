@@ -15,10 +15,14 @@ logger.info("Starting Model Registry")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="raw_data")
-    parser.add_argument("--filter_string", type=str, default="")
-    parser.add_argument("--metric", type=str, choices=["val_loss", "val_acc"], default="val_loss")
-    parser.add_argument("--alias", type=str, default="Production")
+    parser.add_argument("--config_name", type=str, default="raw_data", 
+                        help="Name of the config file")
+    parser.add_argument("--filter_string", type=str, default="", 
+                        help="Filter string for searching runs in MLflow tracking server")
+    parser.add_argument("--metric", type=str, choices=["val_loss", "val_acc"], default="val_loss", 
+                        help="Metric for selecting the best model")
+    parser.add_argument("--alias", type=str, default="Production", 
+                        help="Alias tag of the model. Help to identify the model in the model registry.")
     args = parser.parse_args()
 
 

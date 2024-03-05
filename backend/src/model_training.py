@@ -9,17 +9,27 @@ if __name__ == "__main__":
     logger.info("Starting Model Training")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_version", type=str, required=True)
+    parser.add_argument("--data_version", type=str, required=True, 
+                        help="Version/directory to be used for training")
     parser.add_argument("--model_name", type=str, default="resnet_18",
-                        choices=["resnet_18", "resnet_34", "mobilenet_v2", "mobilenet_v3_small"])
-    parser.add_argument("--epochs", type=int, default=10)
-    parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--weight_decay", type=float, default=1e-5)
-    parser.add_argument("--lr", type=float, default=1e-4)
+                        choices=["resnet_18", "resnet_34", "mobilenet_v2", "mobilenet_v3_small"],
+                        help="Model to be used for training")
+    parser.add_argument("--epochs", type=int, default=10, 
+                        help="Number of epochs for training")
+    parser.add_argument("--batch_size", type=int, default=32, 
+                        help="Batch size for training")
+    parser.add_argument("--weight_decay", type=float, default=1e-5,
+                        help="Weight decay for optimizer")
+    parser.add_argument("--lr", type=float, default=1e-4, 
+                        help="Learning rate for optimizer")
     parser.add_argument("--best_model_metric", type=str, default="val_loss", 
-                        choices=["val_loss", "val_acc"])
-    parser.add_argument("--device", type=str, default="cuda")
-    parser.add_argument("--seed", type=int, default=43)
+                        choices=["val_loss", "val_acc"],
+                        help="Metric for selecting the best model to logging to MLflow")
+    parser.add_argument("--device", type=str, default="cuda", 
+                        choices=["cuda", "cpu"],
+                        help="Device to be used for training")
+    parser.add_argument("--seed", type=int, default=43, 
+                        help="Seed for reproducibility")
     args = parser.parse_args()
     seed_everything(args.seed)
 

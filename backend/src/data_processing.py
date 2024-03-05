@@ -58,10 +58,14 @@ def create_training_data(version: str, source_dir: List[str], dest_dir: str, rat
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version", type=str, required=True)
-    parser.add_argument("--merge_collected", action='store_true')
-    parser.add_argument("--dest_dir", type=str, default=DataPath.TRAIN_DATA_DIR)
-    parser.add_argument("--ratio", type=float, nargs="+", default=[0.6, 0.2])
+    parser.add_argument("--version", type=str, required=True, 
+                        help="Version of the data, e.g. v1, as the name of the folder")
+    parser.add_argument("--merge_collected", action='store_true', 
+                        help="Merge collected data to raw data")
+    parser.add_argument("--dest_dir", type=str, default=DataPath.TRAIN_DATA_DIR, 
+                        help="Destination of directory to save the train/val/test data")
+    parser.add_argument("--ratio", type=float, nargs="+", default=[0.6, 0.2], 
+                        help="Ratio of train/val/test data")
     args = parser.parse_args()
     
     if os.path.exists(DataPath.TRAIN_DATA_DIR / args.version):
