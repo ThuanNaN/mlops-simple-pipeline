@@ -17,3 +17,8 @@ serving_restart:
 teardown:
 	make mlflow_down
 	make serving_down
+
+rebuild_serving:
+	make serving_down
+	docker rmi model_serving-model_serving
+	make serving_up 
