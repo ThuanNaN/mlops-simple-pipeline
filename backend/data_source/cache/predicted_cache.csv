@@ -1,2 +1,0 @@
-Image_name, Image_path, Predictor_name, Predictor_alias, Predicted_prob, Predicted_id, Predicted_class
-vn_cat_test_0.jpg,/backend/data_source/captured,resnet18,Production,0.700126,1,Dog

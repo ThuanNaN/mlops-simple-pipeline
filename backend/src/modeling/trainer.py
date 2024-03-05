@@ -26,9 +26,18 @@ except Exception as e:
     raise e
 
 class Trainer:
-    def __init__(self, model, num_epochs, learning_rate, weight_decay, 
-                 train_data, val_data, batch_size,
-                 device, mlflow_log_pamrams, verbose=False
+    def __init__(self, 
+                 model, 
+                 num_epochs, 
+                 learning_rate, 
+                 weight_decay, 
+                 train_data, 
+                 val_data, 
+                 batch_size: int,
+                 best_model_metric: str,
+                 device: str, 
+                 mlflow_log_pamrams, 
+                 verbose=False
                  ) -> None:
         
         self.model = model.to(device)
@@ -38,6 +47,7 @@ class Trainer:
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size    
+        self.best_model_metric = best_model_metric
         self.device = device
         self.mlflow_log_pamrams = mlflow_log_pamrams
         self.verbose = verbose  
@@ -64,7 +74,10 @@ class Trainer:
             # mlflow.log_artifact("model_summary.txt")
 
             best_val_loss = float('inf')
-            best_model_state_dict = None
+            best_val_acc = float('-inf')
+            best_val_loss_state_dict = None
+            best_val_acc_state_dict = None
+
             
             for epoch in range(self.num_epochs):
                 self.model.train()
@@ -93,11 +106,23 @@ class Trainer:
                 
                 if val_loss < best_val_loss:
                     best_val_loss = val_loss
-                    best_model_state_dict = self.model.state_dict()
+                    best_val_loss_state_dict = self.model.state_dict()
+                    
+                if val_acc > best_val_acc:
+                    best_val_acc = val_acc
+                    best_val_acc_state_dict = self.model.state_dict()
 
                 if self.verbose:
                     logger.info(f"Epoch [{epoch + 1}]/{self.num_epochs} Loss: {epoch_loss:.4f} - Acc: {epoch_acc:.4f} - Val Loss: {val_loss:.4f} - Val Acc: {val_acc:.4f}")
             
+            mlflow.log_metric("Best_val_loss", best_val_loss)
+            mlflow.log_metric("Best_val_acc", best_val_acc)
+
+            if self.best_model_metric == "val_loss":
+                best_model_state_dict = best_val_loss_state_dict
+            else:
+                best_model_state_dict = best_val_acc_state_dict
+                
             self.model.load_state_dict(best_model_state_dict)
             mlflow.pytorch.log_model(self.model, "model")
 
