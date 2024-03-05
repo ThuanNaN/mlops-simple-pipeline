@@ -3,4 +3,5 @@ __pycache__/
 **/run_env/** 
 /data_source/train_data/
 /data_source/cache/
+/data_source/captured/
 /logs/*
