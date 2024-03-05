@@ -24,8 +24,8 @@ python src/model_registry.py --metric val_loss --config_tag raw_data --alias Pro
 make model_config=raw_data serving_up
 ```
 
-### 2.3 Add more add and re-train model
-
+### 2.3 Add more data and re-train model
+Merge labled data from /data_source/collected/ 
 ```bash
 python src/data_processing.py --merge_collected --version v1.1
 
