@@ -9,7 +9,7 @@ from torchinfo import summary
 load_dotenv()
 from utils import Log
 
-logger = Log(__file__).log
+logger = Log(__file__).get_logger()
 logger.info("Trainer")
 
 
@@ -17,9 +17,13 @@ MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME")
 MLFLOW_EXPERIMENT_ID = os.getenv("MLFLOW_EXPERIMENT_ID")
 
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-mlflow.set_experiment(experiment_name=MLFLOW_EXPERIMENT_NAME)
-logger.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
+try:
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment(experiment_name=MLFLOW_EXPERIMENT_NAME)
+    logger.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
+except Exception as e:
+    logger.error(f"Error: {e}")
+    raise e
 
 class Trainer:
     def __init__(self, model, num_epochs, learning_rate, weight_decay, 
