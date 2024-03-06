@@ -1,8 +1,8 @@
 import argparse
 import torchvision
 from modeling import Trainer, create_mobilenet, create_resnet
-from utils import DataPath, CatDog_Data, seed_everything
-from logger import Logger
+from utils import AppPath, Logger, seed_everything
+from config.data_config import CatDog_Data
 
 
 LOGGER = Logger(__file__)
@@ -35,23 +35,23 @@ if __name__ == "__main__":
     seed_everything(args.seed)
 
     try:
-        data_path = DataPath.TRAIN_DATA_DIR/args.data_version
+        data_path = AppPath.TRAIN_DATA_DIR/args.data_version
         assert data_path.exists()
     except AssertionError:
         LOGGER.log.error(f"Data version: {args.data_version} not found.")
         raise FileNotFoundError(f"Data version: {args.data_version} not found.")
 
     train_data = torchvision.datasets.ImageFolder(
-        root=DataPath.TRAIN_DATA_DIR/args.data_version/"train",
+        root=AppPath.TRAIN_DATA_DIR/args.data_version/"train",
         transform=CatDog_Data.train_transform
     )
     val_data = torchvision.datasets.ImageFolder(
-        root=DataPath.TRAIN_DATA_DIR/args.data_version/"val",
+        root=AppPath.TRAIN_DATA_DIR/args.data_version/"val",
         transform=CatDog_Data.test_transform
     )
 
     test_data = torchvision.datasets.ImageFolder(
-        root=DataPath.TRAIN_DATA_DIR/args.data_version/"test",
+        root=AppPath.TRAIN_DATA_DIR/args.data_version/"test",
         transform=CatDog_Data.test_transform
     )
 
@@ -61,8 +61,14 @@ if __name__ == "__main__":
     elif model_prefix == "mobilenet":
         model = create_mobilenet(n_classes=CatDog_Data.n_classes, model_name=args.model_name)
     
-    mlflow_log_pamrams = {
+    mlflow_log_tags = {
         "data_version": args.data_version,
+        "id2label": CatDog_Data.id2label,
+        "label2id": CatDog_Data.label2id,
+    }
+    LOGGER.log.info(f"Model training tasg: {mlflow_log_tags}")
+
+    mlflow_log_pamrams = {
         "model": model.__class__.__name__,
         "model_name": args.model_name,
         "n_epochs": args.epochs,
@@ -71,7 +77,11 @@ if __name__ == "__main__":
         "lr": args.lr,
         "best_model_metric": args.best_model_metric,
         "device": args.device,
-        "seed": args.seed
+        "seed": args.seed,
+        "n_classes": CatDog_Data.n_classes,
+        "image_size": CatDog_Data.img_size,
+        "image_mean": CatDog_Data.mean,
+        "image_std": CatDog_Data.std,
     }
     LOGGER.log.info(f"Model training params: {mlflow_log_pamrams}")
     
@@ -84,6 +94,7 @@ if __name__ == "__main__":
                       batch_size=args.batch_size,   
                       best_model_metric=args.best_model_metric,
                       device=args.device,
+                      mlflow_log_tags=mlflow_log_tags,
                       mlflow_log_pamrams=mlflow_log_pamrams,
                       verbose=True)
 
