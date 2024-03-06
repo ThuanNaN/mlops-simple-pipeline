@@ -20,6 +20,6 @@ predictor = Predictor(model_name=DEPLOY_MODEL_NAME, model_alias=DEPLOY_MODEL_ALI
 
 @router.post("/predict")
 async def predict(file_upload: UploadFile = File(...)):
-    response = predictor.predict(file_upload.file, file_upload.filename)
+    response = await predictor.predict(file_upload.file, file_upload.filename)
     return PredictionResponse(**response)
 

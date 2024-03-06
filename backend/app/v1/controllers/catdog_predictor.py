@@ -24,7 +24,7 @@ class Predictor:
         self.load_model()
         self.create_transform()
 
-    def predict(self, image, image_name):
+    async def predict(self, image, image_name):
         pil_img = Image.open(image)
         LOGGER.save_requests(pil_img, image_name)
 
