@@ -13,7 +13,7 @@ from utils import AppPath, Logger, save_cache
 from dotenv import load_dotenv
 load_dotenv()
 
-LOGGER = Logger(__file__, log_file="model_serving.log")
+LOGGER = Logger(__file__, log_file="predictor.log")
 LOGGER.log.info("Starting Model Serving")
 
 class Predictor:
