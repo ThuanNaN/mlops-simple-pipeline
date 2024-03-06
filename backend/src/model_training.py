@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="resnet_18",
                         choices=["resnet_18", "resnet_34", "mobilenet_v2", "mobilenet_v3_small"],
                         help="Model to be used for training")
-    parser.add_argument("--epochs", type=int, default=10, 
+    parser.add_argument("--epochs", type=int, default=5, 
                         help="Number of epochs for training")
     parser.add_argument("--batch_size", type=int, default=32, 
                         help="Batch size for training")
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("--best_model_metric", type=str, default="val_loss", 
                         choices=["val_loss", "val_acc"],
                         help="Metric for selecting the best model to logging to MLflow")
-    parser.add_argument("--device", type=str, default="cuda", 
+    parser.add_argument("--device", type=str, default="cpu", 
                         choices=["cuda", "cpu"],
                         help="Device to be used for training")
     parser.add_argument("--seed", type=int, default=43, 
