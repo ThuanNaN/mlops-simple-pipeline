@@ -29,7 +29,7 @@ python src/model_registry.py --metric val_loss --alias Production --config_name 
 ### 2.2 Serving trained model
 Load config file, use "alias" to retrieve the model in MLflow server and then deploy it to api
 ```bash
-make model_config=raw_data serving_up
+make model_config=raw_data port=6000 serving_up
 ```
 
 ### 2.3 Add more data and re-train model
@@ -52,7 +52,7 @@ python src/model_registry.py --filter_string "tags.Dataset_version LIKE 'v1.1'" 
 Restart the container to pull model which have "model_config" == "add_collect" for new serving
 ```bash
 make serving_down
-make model_config=add_collect serving_up
+make model_config=add_collect port=6000 serving_up
 ```
 
 ## 3. Turn on/off the system
