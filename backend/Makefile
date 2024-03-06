@@ -22,4 +22,4 @@ all_down:
 rebuild_serving:
 	make serving_down
 	docker rmi model_serving-model_serving
-	make model_config=add_collect serving_up
+	make model_config=raw_data serving_up

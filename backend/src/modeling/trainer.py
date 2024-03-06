@@ -1,28 +1,27 @@
 import os
 import mlflow
-from dotenv import load_dotenv
 import torch
 import torch.nn as nn   
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchinfo import summary
+from logger import Logger   
+from dotenv import load_dotenv
 load_dotenv()
-from utils import Log
 
-logger = Log(__file__).get_logger()
-logger.info("Trainer")
 
+LOGGER = Logger(__file__)
+LOGGER.log.info("Trainer")
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME")
-MLFLOW_EXPERIMENT_ID = os.getenv("MLFLOW_EXPERIMENT_ID")
 
 try:
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment(experiment_name=MLFLOW_EXPERIMENT_NAME)
-    logger.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
+    LOGGER.log.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
 except Exception as e:
-    logger.error(f"Error: {e}")
+    LOGGER.log.error(f"Error: {e}")
     raise e
 
 class Trainer:
@@ -114,7 +113,7 @@ class Trainer:
                     best_val_acc_state_dict = self.model.state_dict()
 
                 if self.verbose:
-                    logger.info(f"Epoch [{epoch + 1}]/{self.num_epochs} Loss: {epoch_loss:.4f} - Acc: {epoch_acc:.4f} - Val Loss: {val_loss:.4f} - Val Acc: {val_acc:.4f}")
+                    LOGGER.log.info(f"Epoch [{epoch + 1}]/{self.num_epochs} Loss: {epoch_loss:.4f} - Acc: {epoch_acc:.4f} - Val Loss: {val_loss:.4f} - Val Acc: {val_acc:.4f}")
             
             mlflow.log_metric("Best_val_loss", best_val_loss)
             mlflow.log_metric("Best_val_acc", best_val_acc)
