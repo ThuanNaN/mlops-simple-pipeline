@@ -13,7 +13,7 @@ serving_down:
 
 all_up:
 	make mlflow_up
-	make model_name=resnet_18 model_alias=Production port=6000 serving_up
+	make model_name=resnet_18 model_alias=Production port=5000 serving_up
 
 all_down:
 	make mlflow_down
@@ -22,4 +22,4 @@ all_down:
 rebuild_serving:
 	make serving_down
 	docker rmi model_serving-model_serving
-	make model_name=resnet_18 model_alias=Production port=6000 serving_up
+	make model_name=resnet_18 model_alias=Production port=5000 serving_up
