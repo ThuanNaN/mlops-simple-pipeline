@@ -7,8 +7,11 @@ from PIL import Image
 from dotenv import load_dotenv
 load_dotenv()
 
+API_URL = os.getenv("API_URL")
+
 num_classes = 2
 id2class = {0: 'Cat', 1: 'Dog'}
+
 
 def predict_api(image_path):
     image = Image.open(image_path)
@@ -17,7 +20,7 @@ def predict_api(image_path):
     image.save(img_byte_arr, format='JPEG')
     img_byte_arr = img_byte_arr.getvalue()
 
-    url = 'http://localhost:5000/predict'  
+    url = f"{API_URL}/predict"
     files = {'file_upload': (img_name, img_byte_arr, 'image/jpeg')}
     headers = {'accept': 'application/json'}
 
@@ -50,7 +53,7 @@ if __name__ == "__main__":
                         ],
                         description="Upload an image to get predictions from the API.")
 
-    host = os.getenv("HOST")
-    port = int(os.getenv("Frontend_PORT"))
-    interface.launch(server_name=host, server_port=port, share=args.share)
+    ui_host = os.getenv("Frontend_HOST")
+    ui_port = int(os.getenv("Frontend_PORT"))
+    interface.launch(server_name=ui_host, server_port=ui_port, share=args.share)
 
