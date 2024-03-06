@@ -13,11 +13,11 @@ serving_down:
 
 serving_restart:
 	make serving_down
-	make model_config=raw_data port=5000 serving_up
+	make model_config=raw_data port=6000 serving_up
 
 all_up:
 	make mlflow_up
-	make model_config=raw_data port=5000 serving_up
+	make model_config=raw_data port=6000 serving_up
 
 all_down:
 	make mlflow_down
@@ -26,4 +26,4 @@ all_down:
 rebuild_serving:
 	make serving_down
 	docker rmi model_serving-model_serving
-	make model_config=raw_data port=5000 serving_up
+	make model_config=raw_data port=6000 serving_up
