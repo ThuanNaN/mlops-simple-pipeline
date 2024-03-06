@@ -51,6 +51,6 @@ if __name__ == "__main__":
                         description="Upload an image to get predictions from the API.")
 
     host = os.getenv("HOST")
-    port = int(os.getenv("PORT"))
+    port = int(os.getenv("Frontend_PORT"))
     interface.launch(server_name=host, server_port=port, share=args.share)
 
