@@ -2,7 +2,4 @@ __pycache__/
 .DS_Store
 **/run_env/** 
 /data_source/train_data/
-/data_source/cache/
-/data_source/captured/
-/src/config/*.json
-/logs/*
+/src/config/serve_config/*.json

@@ -1,0 +1,5 @@
+__pycache__/
+.DS_Store
+cache/captured_data/*.jpg
+cache/*.csv
+logs/*.log
