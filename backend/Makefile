@@ -6,14 +6,18 @@ mlflow_down:
 	docker compose -f ./docker/mlflow/docker-compose.yml down
 
 serving_up:
-	MODEL_CONFIG=$(model_config) docker compose -f ./docker/model_serving/docker-compose.yml up -d
+	MODEL_CONFIG=$(model_config) PORT=$(port) docker compose -f ./docker/model_serving/docker-compose.yml up -d
 
 serving_down:
-	MODEL_CONFIG="" docker compose -f ./docker/model_serving/docker-compose.yml down
+	MODEL_CONFIG="" PORT="" docker compose -f ./docker/model_serving/docker-compose.yml down
+
+serving_restart:
+	make serving_down
+	make model_config=raw_data port=5040 serving_up
 
 all_up:
 	make mlflow_up
-	make serving_up
+	make model_config=raw_data port=5040 serving_up
 
 all_down:
 	make mlflow_down
@@ -22,4 +26,4 @@ all_down:
 rebuild_serving:
 	make serving_down
 	docker rmi model_serving-model_serving
-	make model_config=add_collect serving_up
+	make model_config=raw_data port=5040 serving_up

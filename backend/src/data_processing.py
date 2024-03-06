@@ -4,21 +4,22 @@ import shutil
 import numpy as np  
 from typing import List
 import glob
-from utils import DataPath, CatDog_Data, Log
+from utils import DataPath, CatDog_Data
+from logger import Logger   
 
-logger = Log(__file__).get_logger()
-logger.info("Starting Data Preprocessing")
+LOGGER = Logger(__file__)
+LOGGER.log.info("Starting Data Preprocessing")
 
 def create_training_data(version: str, source_dir: List[str], dest_dir: str, ratio: List[float]):
     """
     Create train/val/test data from raw data
     """
 
-    logger.info(f"Begin create train/val/tets data")
-    logger.info(f"Version: {version}")
-    logger.info(f"Source dir: {source_dir}")
-    logger.info(f"Destination dir: {dest_dir}")
-    logger.info(f"Ratio [train, val]: {ratio}")
+    LOGGER.log.info(f"Begin create train/val/tets data")
+    LOGGER.log.info(f"Version: {version}")
+    LOGGER.log.info(f"Source dir: {source_dir}")
+    LOGGER.log.info(f"Destination dir: {dest_dir}")
+    LOGGER.log.info(f"Ratio [train, val]: {ratio}")
 
     for cls in CatDog_Data.classes:
         os.makedirs(f"{dest_dir}/{version}/train/{cls}", exist_ok=True)
@@ -26,14 +27,14 @@ def create_training_data(version: str, source_dir: List[str], dest_dir: str, rat
         os.makedirs(f"{dest_dir}/{version}/test/{cls}", exist_ok=True)
 
     for cls in CatDog_Data.classes:
-        logger.info(f"Processing {cls} ...")
+        LOGGER.log.info(f"Processing {cls} ...")
         all_cls_files = []
         for source in source_dir:
             source_cls = f"{source}/{cls}"
             all_cls_files.extend(glob.glob(f"{source_cls}/*.jpg"))
 
         num_files = len(all_cls_files)
-        logger.info(f"Number of files of {cls}: {num_files}")
+        LOGGER.log.info(f"Number of files of {cls}: {num_files}")
 
         all_cls_files = np.array(all_cls_files)
         shuffle_indices = np.random.permutation(num_files)
@@ -53,7 +54,7 @@ def create_training_data(version: str, source_dir: List[str], dest_dir: str, rat
         for file in test_files: 
             shutil.copy(file, f"{dest_dir}/{version}/test/{cls}/{os.path.basename(file)}")
 
-    logger.info(f"Finish create train/val/tets data")
+    LOGGER.log.info(f"Finish create train/val/tets data")
     
 
 if __name__ == "__main__":

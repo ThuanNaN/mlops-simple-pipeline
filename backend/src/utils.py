@@ -1,14 +1,9 @@
-import logging
-from logging.handlers import RotatingFileHandler
-import sys
+import os
+from pathlib import Path
 from dataclasses import dataclass
 import torchvision
-from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
-
-LOG_DIR = ROOT_DIR / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 @dataclass
 class DataPath:
@@ -51,34 +46,6 @@ class CatDog_Data:
         torchvision.transforms.Normalize(mean=mean, std=std)
     ])
 
-class Log:
-    def __init__(self, name="") -> None:
-        self.logger = logging.getLogger(name)
-    
-    def get_logger(self, log_level=logging.INFO, log_file=None):
-        self.log_level = log_level
-        self.logger.setLevel(log_level)
-        self.init_formatter()
-        if log_file is not None:
-            self._add_file_hander(LOG_DIR / log_file)
-        else:
-            self._add_stream_hander()
-        return self.logger
-    
-    def init_formatter(self):
-        self.formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-    def _add_stream_hander(self):
-        stream_handler = logging.StreamHandler(sys.stdout)
-        stream_handler.setFormatter(self.formatter)
-        self.logger.addHandler(stream_handler)
-
-    def _add_file_hander(self, log_file):
-        file_handler = RotatingFileHandler(log_file, maxBytes=10000, backupCount=10)
-        file_handler.setFormatter(self.formatter)
-        self.logger.addHandler(file_handler)
-
 
 def seed_everything(seed=42):
     import random
@@ -92,4 +59,12 @@ def seed_everything(seed=42):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    
+
+def save_cache(image_name, image_path, predictor_name, predictor__alias, probs, best_prob, pred_id, pred_class):
+    cache_path = f"{DataPath.CACHE_DIR}/predicted_cache.csv"
+    cache_exists = os.path.isfile(cache_path)
+    with open(cache_path, "a") as f:
+        if not cache_exists:
+            f.write("Image_name, Image_path, Predictor_name, Predictor_alias, Probabilities , Best_prob, Predicted_id, Predicted_class\n")
+        f.write(f"{image_name},{image_path},{predictor_name},{predictor__alias}, {probs},{best_prob},{pred_id},{pred_class}\n")
+

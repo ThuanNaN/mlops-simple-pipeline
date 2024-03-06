@@ -1,17 +1,17 @@
 import argparse
-from dataclasses import asdict
 import os   
 import json
-from utils import Log, DataPath
-from dotenv import load_dotenv
-load_dotenv()
+from dataclasses import asdict
 from config.serve_config import ServeConfig
 import mlflow
 from mlflow.tracking import MlflowClient
+from utils import DataPath
+from logger import Logger
+from dotenv import load_dotenv
+load_dotenv()
 
-
-logger = Log(__file__).get_logger()
-logger.info("Starting Model Registry")
+LOGGER = Logger(__file__)
+LOGGER.log.info("Starting Model Registry")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-    logger.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
+    LOGGER.log.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
 
     MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME")
     experiment_ids = dict(mlflow.get_experiment_by_name(MLFLOW_EXPERIMENT_NAME))['experiment_id']
@@ -40,10 +40,10 @@ if __name__ == "__main__":
                                        order_by=[f"metrics.{args.metric} DESC"]
                                        )[-1]
     except:
-        logger.info("No runs found")
+        LOGGER.log.info("No runs found")
         exit(0)
     
-    logger.info(f"Best run: {best_runs.info.run_id}")
+    LOGGER.log.info(f"Best run: {best_runs.info.run_id}")
 
     model_name = best_runs.data.params["model_name"] 
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     run_id = best_runs.info.run_id
     model_uri = f'runs:/{run_id}/model'
     mv = client.create_model_version(model_name, model_uri, run_id)
-    logger.info(f"Registered model: {model_name}, version: {mv.version}")
+    LOGGER.log.info(f"Registered model: {model_name}, version: {mv.version}")
     client.set_registered_model_alias(model_name, args.alias, mv.version)
 
     server_config = ServeConfig(config_name=args.config_name,
@@ -65,8 +65,8 @@ if __name__ == "__main__":
     with open(path_save_cfg, 'w+') as f:
         json.dump(asdict(server_config), f, indent=4)
         
-    logger.info(f"Config saved to {args.config_name}.json")
+    LOGGER.log.info(f"Config saved to {args.config_name}.json")
 
-    logger.info(f"Model {model_name} registered with alias {args.alias} and version {mv.version}")
-    logger.info("Model Registry completed")
+    LOGGER.log.info(f"Model {model_name} registered with alias {args.alias} and version {mv.version}")
+    LOGGER.log.info("Model Registry completed")
 

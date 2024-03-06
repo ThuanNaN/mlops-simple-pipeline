@@ -22,7 +22,7 @@ services:
         source: ../../src/config
         target: /backend/src/config
     ports:
-      - "5000:5000"
+      - ${PORT}:5000
     extra_hosts:
       - "host.docker.internal:host-gateway"
     entrypoint: ["python", "src/model_serving.py"]

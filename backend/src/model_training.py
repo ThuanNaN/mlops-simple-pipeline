@@ -1,13 +1,14 @@
 import argparse
 import torchvision
 from modeling import Trainer, create_mobilenet, create_resnet
-from utils import DataPath, CatDog_Data, Log, seed_everything
+from utils import DataPath, CatDog_Data, seed_everything
+from logger import Logger
 
+
+LOGGER = Logger(__file__)
+LOGGER.log.info("Starting Model Training")
 
 if __name__ == "__main__":
-    logger = Log(__file__).get_logger()
-    logger.info("Starting Model Training")
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_version", type=str, required=True, 
                         help="Version/directory to be used for training")
@@ -37,7 +38,7 @@ if __name__ == "__main__":
         data_path = DataPath.TRAIN_DATA_DIR/args.data_version
         assert data_path.exists()
     except AssertionError:
-        logger.error(f"Data version: {args.data_version} not found.")
+        LOGGER.log.error(f"Data version: {args.data_version} not found.")
         raise FileNotFoundError(f"Data version: {args.data_version} not found.")
 
     train_data = torchvision.datasets.ImageFolder(
@@ -72,7 +73,7 @@ if __name__ == "__main__":
         "device": args.device,
         "seed": args.seed
     }
-    logger.info(f"Model training params: {mlflow_log_pamrams}")
+    LOGGER.log.info(f"Model training params: {mlflow_log_pamrams}")
     
     trainer = Trainer(model=model,
                       num_epochs = args.epochs,
@@ -87,7 +88,6 @@ if __name__ == "__main__":
                       verbose=True)
 
     trainer.train()
-
-    logger.info(f"Model Training Completed. Model: {args.model_name}, Data: {args.data_version}")
+    LOGGER.log.info(f"Model Training Completed. Model: {args.model_name}, Data: {args.data_version}")
 
 
