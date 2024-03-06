@@ -9,25 +9,19 @@ services:
     env_file:
       - ../../.env
     environment:
-      - MODEL_CONFIG=${MODEL_CONFIG}
       - MLFLOW_TRACKING_URI=http://host.docker.internal:8000
+      - MODEL_NAME=${MODEL_NAME}
+      - MODEL_ALIAS=${MODEL_ALIAS}
+      - DEVICE=${DEVICE}
     volumes:
       - type: bind
-        source: ../../data_source
-        target: /backend/data_source
+        source: ../../app/cache
+        target: /backend/app/cache
       - type: bind
-        source: ../../logs
-        target: /backend/logs
-      - type: bind
-        source: ../../src/config
-        target: /backend/src/config
+        source: ../../app/logs
+        target: /backend/app/logs
     ports:
       - ${PORT}:5000
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    entrypoint: ["python", "src/model_serving.py"]
-  
-volumes:
-  data_source:
-  logs:
-  src:
+    entrypoint: ["python3", "server.py"]
