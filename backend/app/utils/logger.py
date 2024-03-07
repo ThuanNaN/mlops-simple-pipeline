@@ -1,11 +1,7 @@
 import sys
 import logging
 from logging.handlers import RotatingFileHandler
-from utils import DataPath, ROOT_DIR
-
-LOG_DIR = ROOT_DIR / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-
+from .app_path import AppPath
 
 class Logger:
     def __init__(self, name="", log_level=logging.INFO, log_file=None) -> None:
@@ -16,7 +12,7 @@ class Logger:
         self.log.setLevel(log_level)
         self._init_formatter()
         if log_file is not None:
-            self._add_file_hander(LOG_DIR / log_file)
+            self._add_file_hander(AppPath.LOG_DIR / log_file)
         else:
             self._add_stream_hander()
     
@@ -35,7 +31,7 @@ class Logger:
         self.log.addHandler(file_handler)
 
     def save_requests(self, image, image_name):
-        path_save = f"{DataPath.CAPTURED_DATA_DIR}/{image_name}"
+        path_save = f"{AppPath.CAPTURED_DATA_DIR}/{image_name}"
         self.log.info(f"Save image to {path_save}")
         image.save(path_save)
 

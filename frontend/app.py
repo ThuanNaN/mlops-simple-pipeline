@@ -20,7 +20,7 @@ def predict_api(image_path):
     image.save(img_byte_arr, format='JPEG')
     img_byte_arr = img_byte_arr.getvalue()
 
-    url = f"{API_URL}/predict"
+    url = f"{API_URL}/v1/catdog_classification/predict"
     files = {'file_upload': (img_name, img_byte_arr, 'image/jpeg')}
     headers = {'accept': 'application/json'}
 

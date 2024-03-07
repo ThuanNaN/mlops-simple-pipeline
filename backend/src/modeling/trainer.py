@@ -4,8 +4,7 @@ import torch
 import torch.nn as nn   
 from torch.optim import Adam
 from torch.utils.data import DataLoader
-from torchinfo import summary
-from logger import Logger   
+from utils import Logger
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -35,6 +34,7 @@ class Trainer:
                  batch_size: int,
                  best_model_metric: str,
                  device: str, 
+                 mlflow_log_tags,
                  mlflow_log_pamrams, 
                  verbose=False
                  ) -> None:
@@ -48,6 +48,7 @@ class Trainer:
         self.batch_size = batch_size    
         self.best_model_metric = best_model_metric
         self.device = device
+        self.mlflow_log_tags = mlflow_log_tags
         self.mlflow_log_pamrams = mlflow_log_pamrams
         self.verbose = verbose  
     
@@ -58,20 +59,16 @@ class Trainer:
         train_loader = DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         val_loader = DataLoader(self.val_data, batch_size=self.batch_size, shuffle=False)
 
-        run_name = f"{self.mlflow_log_pamrams['model_name']}_{self.mlflow_log_pamrams['data_version']}"
+        run_name = f"{self.mlflow_log_pamrams['model_name']}_{self.mlflow_log_tags['data_version']}"
 
         with mlflow.start_run(run_name=run_name) as run:
-            mlflow.set_tags({"Dataset_version": self.mlflow_log_pamrams["data_version"]})
-
+            mlflow.set_tags(self.mlflow_log_tags)
+            
             mlflow.log_params({
                 "optimizer": optimizer.__class__.__name__,
                 "criterion": self.criterion.__class__.__name__,
             })
             mlflow.log_params(self.mlflow_log_pamrams)
-
-            # with open("model_summary.txt", "w") as f:
-            #     f.write(str(summary(self.model)))
-            # mlflow.log_artifact("model_summary.txt")
 
             best_val_loss = float('inf')
             best_val_acc = float('-inf')
@@ -99,8 +96,8 @@ class Trainer:
                 epoch_loss = running_loss / len(train_loader)
                 epoch_acc = running_corrects / running_total
 
-                mlflow.log_metric("Training_loss", f"{epoch_loss:2f}", step=epoch)
-                mlflow.log_metric("Training_acc", f"{epoch_acc:2f}", step=epoch)
+                mlflow.log_metric("training_loss", f"{epoch_loss:2f}", step=epoch)
+                mlflow.log_metric("training_acc", f"{epoch_acc:2f}", step=epoch)
         
                 val_loss,  val_acc = self.validate(val_loader, epoch=epoch)
                 
@@ -115,13 +112,15 @@ class Trainer:
                 if self.verbose:
                     LOGGER.log.info(f"Epoch [{epoch + 1}]/{self.num_epochs} Loss: {epoch_loss:.4f} - Acc: {epoch_acc:.4f} - Val Loss: {val_loss:.4f} - Val Acc: {val_acc:.4f}")
             
-            mlflow.log_metric("Best_val_loss", best_val_loss)
-            mlflow.log_metric("Best_val_acc", best_val_acc)
+            mlflow.log_metric("best_val_loss", best_val_loss)
+            mlflow.log_metric("best_val_acc", best_val_acc)
 
             if self.best_model_metric == "val_loss":
                 best_model_state_dict = best_val_loss_state_dict
+                LOGGER.log.info(f"Best model metric: {self.best_model_metric} - Best val loss: {best_val_loss:.4f}")
             elif self.best_model_metric == "val_acc":
                 best_model_state_dict = best_val_acc_state_dict
+                LOGGER.log.info(f"Best model metric: {self.best_model_metric} - Best val acc: {best_val_acc:.4f}")
             else:
                 raise ValueError(f"Invalid best_model_metric: {self.best_model_metric}")
             
@@ -144,8 +143,8 @@ class Trainer:
                 running_total += labels.size(0)
         val_loss = running_loss / len(val_loader)
         val_acc = running_corrects / running_total  
-        mlflow.log_metric("Val_loss", f"{val_loss:2f}", step=epoch)
-        mlflow.log_metric("Val_acc", f"{val_acc:2f}", step=epoch)
+        mlflow.log_metric("val_loss", f"{val_loss:2f}", step=epoch)
+        mlflow.log_metric("val_acc", f"{val_acc:2f}", step=epoch)
         return val_loss, val_acc
     
 
