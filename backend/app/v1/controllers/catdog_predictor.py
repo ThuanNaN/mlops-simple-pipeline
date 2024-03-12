@@ -1,15 +1,12 @@
-import os
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 from PIL import Image
-import ast
 import torch
 from torch.nn import functional as F
 import torchvision
-import mlflow
-from mlflow.tracking import MlflowClient
 from utils import AppPath, Logger, save_cache
+from config.data_config import CatDog_Data
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -56,27 +53,17 @@ class Predictor:
 
 
     def load_model(self):
-        MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
-        LOGGER.log.info(f"MLFLOW_TRACKING_URI: {MLFLOW_TRACKING_URI}")
-
         try:
-            mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-            client = MlflowClient()
-            model_mv = client.get_model_version_by_alias(name=self.model_name,
-                                                            alias=self.model_alias)
-            
-            LOGGER.log.info(f"Model loaded: {self.model_name} - {self.model_alias}")
-            
-            run_info = client.get_run(model_mv.run_id)
+            self.loaded_model = torchvision.models.resnet50()
+            in_features = self.loaded_model.fc.in_features
+            self.loaded_model.fc = torch.nn.Linear(in_features, CatDog_Data.n_classes)
 
-            self.id2class = ast.literal_eval(run_info.data.tags["id2label"])
-            self.class2id = ast.literal_eval(run_info.data.tags["label2id"])
-            self.mean = ast.literal_eval(run_info.data.params["image_mean"])
-            self.std = ast.literal_eval(run_info.data.params["image_std"])   
-            self.img_size = int(run_info.data.params["image_size"])
+            self.id2class = CatDog_Data.id2label
+            self.class2id = CatDog_Data.label2id
+            self.mean = CatDog_Data.mean
+            self.std = CatDog_Data.std
+            self.img_size = CatDog_Data.img_size
 
-            self.loaded_model = mlflow.pytorch.load_model(model_mv.source, 
-                                                          map_location=self.device)
         except Exception as e:
             LOGGER.log.info(f"Load model failed")
             LOGGER.log.info(f"Error: {e}")
