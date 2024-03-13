@@ -28,10 +28,8 @@ class Predictor:
         if pil_img.mode == 'RGBA':
             pil_img = pil_img.convert('RGB')
 
-        transformed_image = self.transforms_(pil_img).unsqueeze(0)
-
-        with torch.no_grad():
-            output = self.loaded_model(transformed_image.to(self.device)).cpu()
+        transformed_image = self.transforms_(pil_img).unsqueeze(0)        
+        output = await self.model_inference(transformed_image)
         probs, best_prob, predicted_id, predicted_class = self.output2pred(output)
 
         LOGGER.log_model(self.model_name, self.model_alias)
@@ -53,6 +51,11 @@ class Predictor:
                 "predictor_name": self.model_name, 
                 "predictor_alias": self.model_alias}
 
+    async def model_inference(self, input):
+        input = input.to(self.device)
+        with torch.no_grad():
+            output = self.loaded_model(input.to(self.device)).cpu()
+        return output    
 
     def load_model(self):
         try:
