@@ -27,9 +27,11 @@ class Predictor:
 
         if pil_img.mode == 'RGBA':
             pil_img = pil_img.convert('RGB')
-        
+
         transformed_image = self.transforms_(pil_img).unsqueeze(0)
-        output = self.loaded_model(transformed_image.to(self.device)).detach().cpu()
+
+        with torch.no_grad():
+            output = self.loaded_model(transformed_image.to(self.device)).cpu()
         probs, best_prob, predicted_id, predicted_class = self.output2pred(output)
 
         LOGGER.log_model(self.model_name, self.model_alias)
@@ -57,6 +59,8 @@ class Predictor:
             self.loaded_model = torchvision.models.resnet50()
             in_features = self.loaded_model.fc.in_features
             self.loaded_model.fc = torch.nn.Linear(in_features, CatDog_Data.n_classes)
+            self.loaded_model.to(self.device)
+            self.loaded_model.eval()
 
             self.id2class = CatDog_Data.id2label
             self.class2id = CatDog_Data.label2id
