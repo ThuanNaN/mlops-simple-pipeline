@@ -20,7 +20,7 @@ Split the raw data into train/val/test folder and tagging to v1.0
 python3 src/data_processing.py --version v1.0
 ```
 
-Train model "renset_18" with the data version 1.0. The model will be logged to MLflow.
+Train model "resnet_18" with the data version 1.0. The model will be logged to MLflow.
 
 ```bash
 python3 src/model_training.py --data_version v1.0 --model_name resnet_18 --device cpu
@@ -42,7 +42,7 @@ make model_name=resnet_18 model_alias=Production port=5000 serving_up
 
 ### 2.3 Add more data and re-train model
 
-Merge labled data from /data_source/collected/ with raw_data and split into train/val/test folder. Tagging the version as well as the folder name to v1.1
+Merge labeled data from /data_source/collected/ with raw_data and split into train/val/test folder. Tagging the version as well as the folder name to v1.1
 
 ```bash
 python3 src/data_processing.py --merge_collected --version v1.1
@@ -71,7 +71,7 @@ make model_name=resnet_18 model_alias=Challenger port=5000 serving_up
 
 ## 3. Turn on/off the system
 
-Turn on/off both mlflow and serving containers
+Turn on/off both MLflow and serving containers
 
 ```bash
 make all_down
